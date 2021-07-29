@@ -22,7 +22,7 @@ libthanatos is a simple C++ library for reading and writing Resident Evil Outbre
 
 int main(int argc, char* argv[])
 {
-    std::ifstream("test.nbd", std::ios_base::binary); // Make sure it's in std::ios_base::binary mode
+    std::ifstream nbdStream("test.nbd", std::ios_base::binary); // Make sure it's in std::ios_base::binary mode
     OBNbd nbd;
     if (!nbd.read(nbdStream))
     {
