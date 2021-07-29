@@ -78,7 +78,7 @@ uint32_t SLD_Compress(void* src, uint32_t srcSize, void* dst, uint32_t destSize)
 	uint16_t* d = (uint16_t*)dst;
 	uint16_t* sEnd = s + (srcSize / 2);
 	uint16_t* dEnd = d + (destSize / 2);
-    
+	
 	uint16_t* sc = s;
 	int tokenId = 0;
 	uint16_t* flag = d;
@@ -118,7 +118,7 @@ uint32_t SLD_Compress(void* src, uint32_t srcSize, void* dst, uint32_t destSize)
 				tokenId++;
 			}
 		}
-        
+		
 		if (tokenId > 15)
 		{
 			tokenId = 0;
@@ -127,7 +127,7 @@ uint32_t SLD_Compress(void* src, uint32_t srcSize, void* dst, uint32_t destSize)
 			d += 1;
 		}
 	}
-    
+	
 	while (tokenId < 15)
 	{
 		CMP_PUSH_VALUE(0);
@@ -159,7 +159,7 @@ OBNbd::~OBNbd()
 	for (int i = 0; i < textures.size(); i++)
 	{
 		if (textures[i].tim2Data)
-        	free(textures[i].tim2Data);
+			free(textures[i].tim2Data);
 	}
 }
 
@@ -171,7 +171,7 @@ void OBNbd::write(std::ostream& stream)
 	header.tex.type = 0x584554;
 	header.amo.type = 0x4F4D41;
 	header.ahi.type = 0x494841;
-    
+	
 	std::vector<OBNbdTexture> cTextures(textures.size());
 	header.tex.texCount = (uint32_t) textures.size();
 	header.tex.size = 0;
@@ -186,7 +186,7 @@ void OBNbd::write(std::ostream& stream)
 	header.amo.size = amo.getSize();
 	header.ahi.offset = AlignTo16(header.amo.offset + header.amo.size);
 	header.ahi.size = ahi.getSize();
-    
+	
 	stream.write((char*)&header, sizeof(NBDHeader));
 	for (int i = 0; i < cTextures.size(); i++)
 	{
@@ -195,7 +195,7 @@ void OBNbd::write(std::ostream& stream)
 	}
 	for (int i = 0; i < cTextures.size(); i++)
 		free(cTextures[i].tim2Data);
-    amo.write(stream);
+	amo.write(stream);
 	ahi.write(stream);
 }
 
@@ -204,7 +204,7 @@ int OBNbd::read(std::istream& stream)
 	size_t pos = stream.tellg();
 	NBDHeader header = {0};
 	stream.read((char*)&header, sizeof(NBDHeader));
-    
+	
 	bool correct = true;
 	if (header.tex.type != 0x584554)
 	{
@@ -216,20 +216,20 @@ int OBNbd::read(std::istream& stream)
 	}
 	if (header.amo.type != 0x4f4d41 || header.ahi.type != 0x494841)
 		correct = false;
-    
+	
 	if (!correct)
 	{
 		fprintf(OB_ERROR_OUTPUT, "[OBNbd] Incorrect order or unknown types encountered (%x %x %x)\n",
 			header.tex.type, header.amo.type, header.ahi.type);
 		return 0;
 	}
-    
+	
 	textures.resize(header.tex.texCount);
 	char* texData = (char*) malloc(header.tex.size);
 	
 	stream.seekg(pos + header.tex.offset, std::ios_base::beg);
 	stream.read(texData, header.tex.size);
-    
+	
 	char* currentPos = texData;
 	for (int i = 0; i < textures.size(); i++)
 	{
@@ -242,21 +242,21 @@ int OBNbd::read(std::istream& stream)
 		currentPos += texSize;
 	}
 	free(texData);
-    
+	
 	stream.seekg(pos + header.amo.offset, std::ios_base::beg);
 	if (!amo.read(stream))
 	{
 		fprintf(OB_ERROR_OUTPUT, "[OBNbd] Couldn't load AMO.\n");
 		return 0;
 	};
-    
+	
 	stream.seekg(pos + header.ahi.offset, std::ios_base::beg);
 	if (!ahi.read(stream))
 	{
 		fprintf(OB_ERROR_OUTPUT, "[OBNbd] Couldn't load AHI.\n");
 		return 0;
 	}
-    
+	
 	return 1;
 }
 

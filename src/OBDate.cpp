@@ -12,9 +12,9 @@ OBDate::~OBDate()
 void OBDate::write(std::ostream& stream)
 {
 	OBChkHeader header = { OBType::Date, 
-		                   1, 
-		                   16 };
-    
+						   1, 
+						   16 };
+	
 	stream.write((char*)&header, sizeof(OBChkHeader));
 	uint32_t value = 0;
 	value |= day << 8;

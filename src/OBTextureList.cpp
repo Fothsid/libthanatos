@@ -25,8 +25,8 @@ void OBTextureList::write(std::ostream& stream)
 	if (list.size() > 0)
 	{
 		OBChkHeader header = { OBType::TextureList, 
-			                   list.size(), 
-			                   list.size() * sizeof(_OBAMOTextureRef) + 12 };
+							   list.size(), 
+							   list.size() * sizeof(_OBAMOTextureRef) + 12 };
 		stream.write((char*)&header, sizeof(OBChkHeader));
 
 		for (int i = 0; i < list.size(); i++)

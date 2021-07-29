@@ -24,8 +24,8 @@ void OBMaterial::write(std::ostream& stream)
 	if (type)
 	{
 		OBChkHeader header = { type, 
-			                   1,
-			                   getSize() };
+							   1,
+							   getSize() };
 		stream.write((char*)&header, sizeof(OBChkHeader));
 		
 		_OBAMOMaterial mat = {0};

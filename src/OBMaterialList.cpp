@@ -14,8 +14,8 @@ void OBMaterialList::write(std::ostream& stream)
 	if (list.size() > 0)
 	{
 		OBChkHeader header = { OBType::MaterialList,
-			                   list.size(), 
-			                   getSize() };;
+							   list.size(), 
+							   getSize() };;
 		stream.write((char*)&header, sizeof(OBChkHeader));
 		for (int i = 0; i < list.size(); i++)
 			list[i].write(stream);

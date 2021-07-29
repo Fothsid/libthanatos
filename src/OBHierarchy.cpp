@@ -14,11 +14,11 @@ void OBHierarchy::write(std::ostream& stream)
 	if (roots.size() > 0 && nodeList.size() > 0)
 	{
 		OBChkHeader header = { OBType::Hierarchy, 
-			                   1 + nodeList.size(),
-			                   getSize() };
+							   1 + nodeList.size(),
+							   getSize() };
 		OBChkHeader rListH = { OBType::RootList, 
-			                   roots.size(),
-			                   roots.size() * sizeof(int32_t) + 12};
+							   roots.size(),
+							   roots.size() * sizeof(int32_t) + 12};
 		stream.write((char*)&header, sizeof(OBChkHeader));
 		stream.write((char*)&rListH, sizeof(OBChkHeader));
 		for (int i = 0; i < roots.size(); i++)

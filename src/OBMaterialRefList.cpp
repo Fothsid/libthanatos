@@ -14,8 +14,8 @@ void OBMaterialRefList::write(std::ostream& stream)
 	if (list.size() > 0)
 	{
 		OBChkHeader header = { OBType::MaterialRefList, 
-			                   list.size(), 
-			                   list.size() * sizeof(int32_t) + 12 };
+							   list.size(), 
+							   list.size() * sizeof(int32_t) + 12 };
 		stream.write((char*)&header, sizeof(OBChkHeader));
 		stream.write((char*)&list[0], sizeof(int32_t) * list.size());
 	}

@@ -12,32 +12,32 @@ OBNode::~OBNode()
 void OBNode::write(std::ostream& stream)
 {
 	OBChkHeader header = { type, 
-		                   1,
-		                   getSize() };
-    _OBAHINode data = {0};
-    data.id = localId;
-    if (parent)
-    	data.parentId = parent->localId;
-    else
-    	data.parentId = -1;
+						   1,
+						   getSize() };
+	_OBAHINode data = {0};
+	data.id = localId;
+	if (parent)
+		data.parentId = parent->localId;
+	else
+		data.parentId = -1;
 
-    if (child)
-    	data.childId = child->localId;
-    else
-    	data.childId = -1;
+	if (child)
+		data.childId = child->localId;
+	else
+		data.childId = -1;
 
-    if (next)
-    	data.nextId = next->localId;
-    else
-    	data.nextId = -1;
+	if (next)
+		data.nextId = next->localId;
+	else
+		data.nextId = -1;
 
-    data.transform = transform;
-    data.transform.rotation[0] = -transform.rotation[0]; // Fixing rotations
+	data.transform = transform;
+	data.transform.rotation[0] = -transform.rotation[0]; // Fixing rotations
 	data.transform.rotation[1] = -transform.rotation[1];
 	data.transform.rotation[2] = -transform.rotation[2]; 
 
 	data.groupId = data.groupId;
-    if (type == OBType::NodeMesh)
+	if (type == OBType::NodeMesh)
 		data.meshId = meshId;
 	else
 		data.meshId = -1;

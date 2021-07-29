@@ -12,8 +12,8 @@ OBRenderAttribs::~OBRenderAttribs()
 void OBRenderAttribs::write(std::ostream& stream)
 {
 	OBChkHeader header = { OBType::RenderAttribs, 
-		                   1, 
-		                   sizeof(_OBRenderAttribs) + 12 };
+						   1, 
+						   sizeof(_OBRenderAttribs) + 12 };
 	stream.write((char*)&header, sizeof(OBChkHeader));
 	stream.write((char*)&attribs, sizeof(_OBRenderAttribs));
 }

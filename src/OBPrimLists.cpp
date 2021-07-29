@@ -15,8 +15,8 @@ void OBPrimLists::write(std::ostream& stream)
 	if (lists.size() > 0)
 	{
 		OBChkHeader header = { OBType::PrimLists,
-			                   lists.size(), 
-			                   getSize() };;
+							   lists.size(), 
+							   getSize() };;
 		stream.write((char*)&header, sizeof(OBChkHeader));
 		for (int i = 0; i < lists.size(); i++)
 			lists[i].write(stream);

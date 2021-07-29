@@ -14,8 +14,8 @@ void OBTexCoordList::write(std::ostream& stream)
 	if (list.size() > 0)
 	{
 		OBChkHeader header = { OBType::TexCoordList, 
-			                   list.size(), 
-			                   getSize() };
+							   list.size(), 
+							   getSize() };
 		stream.write((char*)&header, sizeof(OBChkHeader));
 		stream.write((char*)&list[0], sizeof(OBTexCoord) * list.size());
 	}

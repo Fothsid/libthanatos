@@ -14,8 +14,8 @@ void OBTStripList::write(std::ostream& stream)
 	if (list.size() > 0)
 	{
 		OBChkHeader header = { type,
-			                   list.size(), 
-			                   getSize() };;
+							   list.size(), 
+							   getSize() };;
 		stream.write((char*)&header, sizeof(OBChkHeader));
 		for (uint32_t i = 0; i < list.size(); i++)
 		{

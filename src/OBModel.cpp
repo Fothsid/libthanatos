@@ -16,8 +16,8 @@ OBModel::~OBModel()
 void OBModel::write(std::ostream& stream)
 {
 	OBChkHeader header = { OBType::Model,
-		                   getSubchunkCount(), 
-		                   getSize() };
+						   getSubchunkCount(), 
+						   getSize() };
 	stream.write((char*)&header, sizeof(OBChkHeader));
 	if (date)         date->write(stream);
 	if (meshList)     meshList->write(stream);

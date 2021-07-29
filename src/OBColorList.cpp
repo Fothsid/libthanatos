@@ -14,8 +14,8 @@ void OBColorList::write(std::ostream& stream)
 	if (list.size() > 0)
 	{
 		OBChkHeader header = { OBType::ColorList, 
-			                   list.size(), 
-			                   list.size() * sizeof(OBColor) + 12 };
+							   list.size(), 
+							   list.size() * sizeof(OBColor) + 12 };
 		stream.write((char*)&header, sizeof(OBChkHeader));
 		stream.write((char*)&list[0], sizeof(OBColor) * list.size());
 	}

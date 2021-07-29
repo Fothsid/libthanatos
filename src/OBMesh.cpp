@@ -22,8 +22,8 @@ OBMesh::~OBMesh()
 void OBMesh::write(std::ostream& stream)
 {
 	OBChkHeader header = { getType(),
-		                   getSubchunkCount(), 
-		                   getSize() };
+						   getSubchunkCount(), 
+						   getSize() };
 	stream.write((char*)&header, sizeof(OBChkHeader));
 	if (primLists)          primLists->write(stream);
 	if (materialRefList)    materialRefList->write(stream);
