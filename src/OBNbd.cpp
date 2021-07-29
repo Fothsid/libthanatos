@@ -210,7 +210,7 @@ int OBNbd::read(std::istream& stream)
 	{
 		if (header.tex.type == 0x444954)
 		{
-			fprintf(OB_ERROR_OUTPUT, "[OBNbd] TID found. Use OBRoomNbd for room models instead.\n");
+			fprintf(OB_ERROR_OUTPUT, "[OBNbd] TID found. Room model reading/writing is not implemented yet.\n");
 		}
 		correct = false;
 	}
