@@ -24,11 +24,11 @@ int main(int argc, char* argv[])
 {
     std::ifstream("test.nbd", std::ios_base::binary); // Make sure it's in std::ios_base::binary mode
     OBNbd nbd;
-	if (!nbd.read(nbdStream))
-	{
-		fprintf(stderr, "Error parsing the NBD file\n");
-		return 0;
-	}
+    if (!nbd.read(nbdStream))
+    {
+        fprintf(stderr, "Error parsing the NBD file\n");
+        return 0;
+    }
     printf("Bone count: %d\n", nbd.ahi.nodeList.size());
 }
 
