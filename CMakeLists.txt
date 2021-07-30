@@ -24,6 +24,7 @@ set(SRC
 	src/OBMeshList.cpp
 	src/OBModel.cpp
 	src/OBNode.cpp
+	src/OBSld.cpp
 	src/OBHierarchy.cpp
 	src/OBNbd.cpp
 	)
