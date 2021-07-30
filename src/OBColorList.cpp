@@ -17,7 +17,15 @@ void OBColorList::write(std::ostream& stream)
 							   list.size(), 
 							   list.size() * sizeof(OBColor) + 12 };
 		stream.write((char*)&header, sizeof(OBChkHeader));
-		stream.write((char*)&list[0], sizeof(OBColor) * list.size());
+		for (int i = 0; i < list.size(); i++)
+		{
+			float rgba[4];
+			rgba[0] = list[i].r * 255.0f;
+			rgba[1] = list[i].g * 255.0f;
+			rgba[2] = list[i].b * 255.0f;
+			rgba[3] = list[i].a * 255.0f;
+			stream.write((char*)&rgba[0], sizeof(OBColor));
+		}
 	}
 }
 
@@ -40,6 +48,19 @@ int OBColorList::read(std::istream& stream)
 
 	list.resize(header.count);
 	stream.read((char*)&list[0], sizeof(OBColor) * header.count);
+
+	/* 
+		Converting color vertices from 0-255 range to 0-1 range because
+		0-255 range in floats is ugly
+	 */
+
+	for (int i = 0; i < list.size(); i++)
+	{
+		list[i].r /= 255.0f;
+		list[i].g /= 255.0f;
+		list[i].b /= 255.0f;
+		list[i].a /= 255.0f;
+	}
 
 	return 1;
 }
