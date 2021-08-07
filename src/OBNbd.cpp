@@ -31,7 +31,12 @@ OBNbd::~OBNbd()
 	}
 }
 
-#define AlignTo16(X) (16 - (X) % 16)
+#define AlignTo16(X) (((X) + 15) & ~15)
+#define FillBytes(X) \
+    for (int __i = 0; __i < (X); __i++) \
+    { \
+		uint8_t b = 0; stream.write((char*)&b, 1);\
+    }
 
 void OBNbd::write(std::ostream& stream)
 {
@@ -45,9 +50,16 @@ void OBNbd::write(std::ostream& stream)
 	header.tex.size = 0;
 	for (int i = 0; i < cTextures.size(); i++)
 	{
-		cTextures[i].tim2Data = malloc(textures[i].size * 2);
-		cTextures[i].size = OBSld::compress(textures[i].tim2Data, textures[i].size, cTextures[i].tim2Data, textures[i].size * 2);
-		header.tex.size += cTextures[i].size + 4;
+		if (textures[i].tim2Data)
+		{
+			cTextures[i].tim2Data = malloc(textures[i].size * 3);
+			if (!cTextures[i].tim2Data)
+			{
+				fprintf(OB_ERROR_OUTPUT, "[OBNbd] Could not allocate memory for texture compression\n");
+			}
+			cTextures[i].size = OBSld::compress(textures[i].tim2Data, textures[i].size, cTextures[i].tim2Data, textures[i].size * 3);
+			header.tex.size += cTextures[i].size + 4;
+		}
 	}
 	header.tex.offset = sizeof(NBDHeader);
 	header.amo.offset = AlignTo16(header.tex.offset + header.tex.size);
@@ -58,12 +70,21 @@ void OBNbd::write(std::ostream& stream)
 	stream.write((char*)&header, sizeof(NBDHeader));
 	for (int i = 0; i < cTextures.size(); i++)
 	{
-		stream.write((char*)&cTextures[i].size, sizeof(uint32_t));
-		stream.write((char*)cTextures[i].tim2Data, cTextures[i].size);
+		if (cTextures[i].tim2Data)
+		{
+			stream.write((char*)&cTextures[i].size, sizeof(uint32_t));
+			stream.write((char*)cTextures[i].tim2Data, cTextures[i].size);
+		}
 	}
 	for (int i = 0; i < cTextures.size(); i++)
-		free(cTextures[i].tim2Data);
+	{
+		if (cTextures[i].tim2Data)
+			free(cTextures[i].tim2Data);
+	}
+	FillBytes(header.amo.offset - (header.tex.offset + header.tex.size));
 	amo.write(stream);
+	
+	FillBytes(header.ahi.offset - (header.amo.offset + header.amo.size));
 	ahi.write(stream);
 }
 

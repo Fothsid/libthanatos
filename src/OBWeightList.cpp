@@ -19,9 +19,9 @@ void OBWeightList::write(std::ostream& stream)
 		stream.write((char*)&header, sizeof(OBChkHeader));
 		for (uint32_t i = 0; i < list.size(); i++)
 		{
-			uint32_t boneCount = list[i].size();
-			stream.write((char*)&boneCount, sizeof(uint32_t));
-			stream.write((char*)&list[i][0], sizeof(OBWeight) * boneCount);
+			uint32_t jointCount = list[i].size();
+			stream.write((char*)&jointCount, sizeof(uint32_t));
+			stream.write((char*)&list[i][0], sizeof(OBWeight) * jointCount);
 		}
 	}
 }
@@ -46,10 +46,10 @@ int OBWeightList::read(std::istream& stream)
 	list.resize(header.count);
 	for (uint32_t i = 0; i < header.count; i++)
 	{
-		uint32_t boneCount = 0;
-		stream.read((char*)&boneCount, sizeof(uint32_t));
-		list[i].resize(boneCount);
-		stream.read((char*)&list[i][0], sizeof(OBWeight) * boneCount);
+		uint32_t jointCount = 0;
+		stream.read((char*)&jointCount, sizeof(uint32_t));
+		list[i].resize(jointCount);
+		stream.read((char*)&list[i][0], sizeof(OBWeight) * jointCount);
 	}
 
 	return 1;

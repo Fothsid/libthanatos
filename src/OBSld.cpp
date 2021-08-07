@@ -1,4 +1,5 @@
 #include <thanatos/OBSld.h>
+#include <cstdio>
 
 uint32_t OBSld::decompress(void* src, uint32_t srcSize, void* dest, uint32_t destSize)
 {
@@ -69,6 +70,10 @@ uint32_t OBSld::decompress(void* src, uint32_t srcSize, void* dest, uint32_t des
 #define CMP_PUSH_REF_TOKEN(offset, count) *d = ((offset) & 0x7FF | (((count) & 0x1F) << 0xb)); d++;
 #define CMP_PUSH_VALUE(value) *d = (value); d++;
 
+/*
+	Could be improved
+	Compression rate isn't too good :)
+*/
 uint32_t OBSld::compress(void* src, uint32_t srcSize, void* dst, uint32_t destSize)
 {
 	uint16_t* s = (uint16_t*)src;
@@ -86,7 +91,7 @@ uint32_t OBSld::compress(void* src, uint32_t srcSize, void* dst, uint32_t destSi
 		if (*sc == 0)
 		{
 			int count = 0;
-			while (*(sc + count + 1) != 0 || count < 31)
+			while (*(sc + count) == 0 && count < 31)
 				count++;
 			CMP_PUSH_REF_TOKEN(0, count);
 			sc += count;
@@ -95,13 +100,15 @@ uint32_t OBSld::compress(void* src, uint32_t srcSize, void* dst, uint32_t destSi
 		}
 		else
 		{
-			int offset = (int)((sc - s) < 2047 ? (sc - s) : 2047);
+			int64_t dif = ((int64_t)sc - (int64_t)s) / 2;
+			int offset = (int)(dif < 2047 ? dif : 2047);
 			while (*sc != *(sc - offset) && offset > 0)
 				offset--;
+
 			if (offset > 0)
 			{
 				int count = 0;
-				while (*(sc + count) == *(sc - offset + count) && count < 31)
+				while (*(sc + count) == *((sc - offset) + count) && count < 31)
 					count++;
 				CMP_PUSH_REF_TOKEN(offset, count);
 				sc += count;
@@ -114,6 +121,7 @@ uint32_t OBSld::compress(void* src, uint32_t srcSize, void* dst, uint32_t destSi
 				sc += 1;
 				tokenId++;
 			}
+
 		}
 		
 		if (tokenId > 15)

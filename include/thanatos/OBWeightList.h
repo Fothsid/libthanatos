@@ -3,7 +3,7 @@
 
 struct OBWeight
 {
-	uint32_t bone;
+	uint32_t id;
 	float weight;
 };
 

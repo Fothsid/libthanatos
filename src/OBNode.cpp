@@ -36,7 +36,7 @@ void OBNode::write(std::ostream& stream)
 	data.transform.rotation[1] = -transform.rotation[1];
 	data.transform.rotation[2] = -transform.rotation[2]; 
 
-	data.groupId = data.groupId;
+	data.groupId = groupId;
 	if (type == OBType::NodeMesh)
 		data.meshId = meshId;
 	else

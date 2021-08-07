@@ -3,9 +3,9 @@
 
 struct NodeTransform
 {
-	float scale[4];
-	float rotation[4];
-	float translation[4];
+	float scale[4]       = {1.0f, 1.0f, 1.0f, 1.0f};
+	float rotation[4]    = {0.0f, 0.0f, 0.0f, 1.0f};
+	float translation[4] = {0.0f, 0.0f, 0.0f, 1.0f};
 };
 
 struct _OBAHINode
@@ -39,9 +39,7 @@ public:
 	int localId;
 	int meshId;
 	int groupId;
-	OBNode* parent;
-	OBNode* child;
-	OBNode* next;
-
-	std::vector<OBObject*> children;
+	OBNode* parent = 0;
+	OBNode* child = 0;
+	OBNode* next = 0;
 };

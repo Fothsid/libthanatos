@@ -17,8 +17,8 @@ public:
 
 	int getSubchunkCount();
 
-	OBDate* date;
-	OBMeshList* meshList;
-	OBMaterialList* materialList;
-	OBTextureList* textureList;
+	OBDate* date                 = 0;
+	OBMeshList* meshList         = 0;
+	OBMaterialList* materialList = 0;
+	OBTextureList* textureList   = 0;
 };
