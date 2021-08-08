@@ -88,40 +88,27 @@ uint32_t OBSld::compress(void* src, uint32_t srcSize, void* dst, uint32_t destSi
 	d += 1;
 	while (sc < sEnd && d < dEnd)
 	{
-		if (*sc == 0)
+		int64_t dif = ((int64_t)sc - (int64_t)s) / 2;
+		int offset = (int)(dif < 2047 ? dif : 2047);
+		while (*sc != *(sc - offset) && offset > 0)
+			offset--;
+
+		if (offset > 0)
 		{
 			int count = 0;
-			while (*(sc + count) == 0 && count < 31)
+			while (*(sc + count) == *((sc - offset) + count) && count < 31)
 				count++;
-			CMP_PUSH_REF_TOKEN(0, count);
+
+			CMP_PUSH_REF_TOKEN(offset, count);
 			sc += count;
 			*flag = (*flag) | (1 << (15 - tokenId));
 			tokenId++;
 		}
 		else
 		{
-			int64_t dif = ((int64_t)sc - (int64_t)s) / 2;
-			int offset = (int)(dif < 2047 ? dif : 2047);
-			while (*sc != *(sc - offset) && offset > 0)
-				offset--;
-
-			if (offset > 0)
-			{
-				int count = 0;
-				while (*(sc + count) == *((sc - offset) + count) && count < 31)
-					count++;
-				CMP_PUSH_REF_TOKEN(offset, count);
-				sc += count;
-				*flag = (*flag) | (1 << (15 - tokenId));
-				tokenId++;
-			}
-			else
-			{
-				CMP_PUSH_VALUE(*sc);
-				sc += 1;
-				tokenId++;
-			}
-
+			CMP_PUSH_VALUE(*sc);
+			sc += 1;
+			tokenId++;
 		}
 		
 		if (tokenId > 15)
