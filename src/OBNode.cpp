@@ -90,7 +90,7 @@ int OBNode::read(std::istream& stream)
 	else
 		next = NULL;
 
-	if (type == OBType::NodeMesh)
+	if (type == OBType::NodeMesh || data.meshId > -1)
 		meshId = data.meshId;
 	groupId = data.groupId;
 	return 1;
