@@ -172,10 +172,6 @@ uint32_t OBSld::compress(void* src, uint32_t srcSize, void* dst, uint32_t destSi
 	fprintf(OB_ERROR_OUTPUT, "* compression ratio: %f\n", ((float)srcSize)/((float)resultSize));
 	fprintf(OB_ERROR_OUTPUT, "* space saving:      %f\n", 1.0f-((float)resultSize)/((float)srcSize));
 	fprintf(OB_ERROR_OUTPUT, "-------------------------------------------\n");
-
-	FILE* fp = fopen("src.bin", "wb");
-	fwrite(src, srcSize, 1, fp);
-	fclose(fp);
 #endif
 	free(table);
 	return resultSize;
