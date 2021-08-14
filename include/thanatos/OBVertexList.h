@@ -6,6 +6,11 @@ struct OBVertex
 	float x, y, z;
 };
 
+inline bool operator== (const OBVertex& l, const OBVertex& r)
+{
+	return l.x == r.x && l.y == r.y && l.z == r.z;
+}
+
 class OBVertexList : public OBObject
 {
 public:

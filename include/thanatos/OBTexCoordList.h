@@ -6,6 +6,11 @@ struct OBTexCoord
 	float u, v;
 };
 
+inline bool operator== (const OBTexCoord& l, const OBTexCoord& r)
+{
+	return l.u == r.u && l.v == r.v;
+}
+
 class OBTexCoordList : public OBObject
 {
 public:

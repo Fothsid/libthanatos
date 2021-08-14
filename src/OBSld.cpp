@@ -4,6 +4,20 @@
 #include <cstring>
 #include <cstdlib>
 
+#define BOUND_CHECK_SRC(pos) \
+	if ((pos) >= sSize) \
+	{ \
+		fprintf(OB_ERROR_OUTPUT, "[OBSld] Source data bound check failed. Something went wrong.\n");  \
+		return 0; \
+	}
+
+#define BOUND_CHECK_DST(pos) \
+	if ((pos) >= dSize) \
+	{ \
+		fprintf(OB_ERROR_OUTPUT, "[OBSld] Destination data bound check failed. Something went wrong.\n");  \
+		return 0; \
+	}
+
 uint32_t OBSld::decompress(void* src, uint32_t srcSize, void* dest, uint32_t destSize)
 {
 	uint16_t* s = (uint16_t*) src;
@@ -18,6 +32,7 @@ uint32_t OBSld::decompress(void* src, uint32_t srcSize, void* dest, uint32_t des
 	{
 		if (bLeft == 0)
 		{
+			BOUND_CHECK_SRC(sPos);
 			flag = s[sPos];
 			sPos++;
 			bLeft = 16;
@@ -25,12 +40,14 @@ uint32_t OBSld::decompress(void* src, uint32_t srcSize, void* dest, uint32_t des
 		
 		if (flag & 0x8000)
 		{
+			BOUND_CHECK_SRC(sPos);
 			uint16_t mode = s[sPos];
 			sPos++;
 			
 			uint16_t count = mode >> 0xb;
 			if (count == 0)
 			{
+				BOUND_CHECK_SRC(sPos);
 				count = s[sPos];
 				sPos++;
 			}
@@ -41,7 +58,10 @@ uint32_t OBSld::decompress(void* src, uint32_t srcSize, void* dest, uint32_t des
 				for (int i = 0; i < count; i++)
 				{
 					if (d)
+					{
+						BOUND_CHECK_DST(dPos);
 						d[dPos] = 0;
+					}
 					dPos++;
 				}
 			}
@@ -51,17 +71,25 @@ uint32_t OBSld::decompress(void* src, uint32_t srcSize, void* dest, uint32_t des
 				for (int i = 0; i < count; i++)
 				{
 					if (d)
+					{
+						BOUND_CHECK_DST(dPos);
+						BOUND_CHECK_DST(pos + i);
 						d[dPos] = d[pos + i];
+					}
 					dPos++;
 				}
 			}
 		}
 		else
 		{
+			BOUND_CHECK_SRC(sPos);
 			uint16_t val = s[sPos];
 			sPos++;
 			if (d)
+			{
+				BOUND_CHECK_DST(dPos);
 				d[dPos] = val;
+			}
 			dPos++;
 		}
 		flag = flag << 1;
