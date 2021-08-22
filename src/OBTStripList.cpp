@@ -15,7 +15,7 @@ void OBTStripList::write(std::ostream& stream)
 	{
 		OBChkHeader header = { type,
 							   list.size(), 
-							   getSize() };;
+							   getSize() };
 		stream.write((char*)&header, sizeof(OBChkHeader));
 		for (uint32_t i = 0; i < list.size(); i++)
 		{
@@ -58,10 +58,15 @@ int OBTStripList::read(std::istream& stream)
 
 uint32_t OBTStripList::getSize()
 {
-	uint32_t size = list.size() * sizeof(uint32_t) + 12;
-	for (int i = 0; i < list.size(); i++)
-		size += list[i].indices.size() * sizeof(uint32_t);
-	return size;
+	if (list.size() > 0)
+	{
+		uint32_t size = list.size() * sizeof(uint32_t) + 12;
+		for (int i = 0; i < list.size(); i++)
+			size += list[i].indices.size() * sizeof(uint32_t);
+		
+		return size;
+	}
+	return 0;
 }
 
 uint32_t OBTStripList::getType()

@@ -11,7 +11,7 @@ libthanatos is a simple C++ library for reading and writing Resident Evil Outbre
 * libthanatos outputs error and warning messages to `stderr` by default, define `OB_ERROR_OUTPUT` before including `thanatos.h` in order to change that.
 * Error and warning message output is not very consistent.
 * This library *does not* automatically convert triangle lists to triangle strips and vice-versa. Do that yourself.
-* This library *does not* automatically convert TIM2 textures to a different format and vice-versa. Once again, do that yourself. [OutbreakTK](https://github.com/Fothsid/OutbreakTK) has TIM2 [handling](https://github.com/Fothsid/OutbreakTK/blob/master/common/tim2.c) and [conversion](https://github.com/Fothsid/OutbreakTK/blob/master/outbreaktim2/main.c) code. Feel free to use it.
+* This library *does not* automatically convert TIM2 textures to a different format and vice-versa. Once again, do that yourself. [OBTool](https://github.com/Fothsid/OBTool) has TIM2 [handling](https://github.com/Fothsid/OutbreakTK/blob/master/common/tim2.c) and [conversion](https://github.com/Fothsid/OutbreakTK/blob/master/outbreaktim2/main.c) code. Feel free to use it.
 
 ## Example usage
 
@@ -29,7 +29,7 @@ int main(int argc, char* argv[])
         fprintf(stderr, "Error parsing the NBD file\n");
         return 0;
     }
-    printf("Bone count: %d\n", nbd.ahi.nodeList.size());
+    printf("Bone count: %d\n", nbd.model.hierarchy->nodeList.size());
 }
 
 ```

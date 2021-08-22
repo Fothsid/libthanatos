@@ -27,6 +27,7 @@ set(SRC
 	src/OBSld.cpp
 	src/OBHierarchy.cpp
 	src/OBNbd.cpp
+	src/OBTypes.cpp
 	)
 
 add_library(thanatos ${SRC})

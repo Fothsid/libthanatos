@@ -32,10 +32,6 @@ void OBNode::write(std::ostream& stream)
 		data.nextId = -1;
 
 	data.transform = transform;
-	data.transform.rotation[0] = -transform.rotation[0]; // Fixing rotations
-	data.transform.rotation[1] = -transform.rotation[1];
-	data.transform.rotation[2] = -transform.rotation[2]; 
-
 	data.groupId = groupId;
 	if (type == OBType::NodeMesh)
 		data.meshId = meshId;
@@ -70,9 +66,6 @@ int OBNode::read(std::istream& stream)
 	
 	type = header.type;
 	transform = data.transform;
-	transform.rotation[0] = -transform.rotation[0]; // Fixing rotations
-	transform.rotation[1] = -transform.rotation[1];
-	transform.rotation[2] = -transform.rotation[2]; 
 
 	localId = data.id;
 	if (data.parentId >= 0)

@@ -16,7 +16,7 @@ void OBHierarchy::write(std::ostream& stream)
 		OBChkHeader header = { OBType::Hierarchy, 
 							   1 + nodeList.size(),
 							   getSize() };
-		OBChkHeader rListH = { OBType::RootList, 
+		OBChkHeader rListH = { OBType::RootList & 0x7fffffff, 
 							   roots.size(),
 							   roots.size() * sizeof(int32_t) + 12};
 		stream.write((char*)&header, sizeof(OBChkHeader));
@@ -40,9 +40,9 @@ int OBHierarchy::read(std::istream& stream)
 	}
 
 	stream.read((char*)&rootListHeader, sizeof(OBChkHeader));
-	if (rootListHeader.type & 0x7fffffff != OBType::RootList)
+	if ((rootListHeader.type | OBType::RootList) != OBType::RootList)
 	{
-		fprintf(OB_ERROR_OUTPUT, "[OBHierarchy] First chunk is not a root list. (%X)\n", header.type);
+		fprintf(OB_ERROR_OUTPUT, "[OBHierarchy] First chunk is not a root list. (%X)\n", rootListHeader.type);
 		return 0;
 	}
 

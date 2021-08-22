@@ -14,9 +14,15 @@ void OBPrimLists::write(std::ostream& stream)
 {
 	if (lists.size() > 0)
 	{
+		int listCount = 0;
+		if (lists[0].list.size() > 0)
+			listCount++;
+		if (lists.size() > 1 && lists[1].list.size() > 0)
+			listCount++;
+
 		OBChkHeader header = { OBType::PrimLists,
-							   lists.size(), 
-							   getSize() };;
+							   listCount, 
+							   getSize() };
 		stream.write((char*)&header, sizeof(OBChkHeader));
 		for (int i = 0; i < lists.size(); i++)
 			lists[i].write(stream);
@@ -44,7 +50,7 @@ int OBPrimLists::read(std::istream& stream)
 	for (int i = 0; i < header.count; i++)
 		if (!lists[i].read(stream))
 		{
-			fprintf(OB_ERROR_OUTPUT, "[OBPrimLists] Unable to read a triangle strip list.\n");
+			fprintf(OB_ERROR_OUTPUT, "[OBPrimLists] Unable to read a triangle strip list. (%d)\n", i);
 			return 0;
 		}
 
