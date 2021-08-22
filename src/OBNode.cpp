@@ -38,6 +38,16 @@ void OBNode::write(std::ostream& stream)
 	else
 		data.meshId = -1;
 
+	if (type == OBType::NodeJoint)
+	{
+		data.transform.rotation[0] = -transform.rotation[0];
+		data.transform.rotation[1] = -transform.rotation[1];
+		data.transform.rotation[2] = -transform.rotation[2];
+		data.transform.scale[0] = 1.0f / transform.scale[0];
+		data.transform.scale[1] = 1.0f / transform.scale[1];
+		data.transform.scale[2] = 1.0f / transform.scale[2];
+	}
+
 	stream.write((char*)&header, sizeof(OBChkHeader));
 	stream.write((char*)&data, sizeof(_OBAHINode));
 }
@@ -66,6 +76,16 @@ int OBNode::read(std::istream& stream)
 	
 	type = header.type;
 	transform = data.transform;
+
+	if (type == OBType::NodeJoint)
+	{
+		transform.rotation[0] = -transform.rotation[0];
+		transform.rotation[1] = -transform.rotation[1];
+		transform.rotation[2] = -transform.rotation[2];
+		transform.scale[0] = 1.0f / transform.scale[0];
+		transform.scale[1] = 1.0f / transform.scale[1];
+		transform.scale[2] = 1.0f / transform.scale[2];
+	}
 
 	localId = data.id;
 	if (data.parentId >= 0)
