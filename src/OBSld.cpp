@@ -169,7 +169,7 @@ uint32_t OBSld::compress(void* src, uint32_t srcSize, void* dst, uint32_t destSi
 	}
 
 	uint32_t resultSize = (uint32_t)((d - ((uint16_t*)dst)) * 2);
-#ifdef _DEBUG
+#ifdef OBSLD_COMP_REPORT
 	/* Report compression efficiency */
 	fprintf(OB_ERROR_OUTPUT, "---=== Compression efficiency report ===---\n");
 	fprintf(OB_ERROR_OUTPUT, "* source size:       %d\n", srcSize);

@@ -122,7 +122,10 @@ void OBNbd::write(std::ostream& stream)
 		return;
 
 	NBDHeader header = {0};
-	header.tex.type = 0x584554;
+	if (textureType == OBType::TextureData)
+		header.tex.type = 0x584554;
+	else if (textureType == OBType::TextureAFSRef)
+		header.tex.type = 0x444954;
 
 	if (type == OBType::NBD)
 	{
