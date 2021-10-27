@@ -84,7 +84,6 @@ uint32_t OBSld::decompress(void* src, uint32_t srcSize, void* dest, uint32_t des
 
 uint32_t OBSld::compress(void* src, uint32_t srcSize, void* dst, uint32_t destSize)
 {
-	int16_t* table = (int16_t*) malloc(2048*2048*2);
 	uint16_t* s = (uint16_t*)src;
 	uint16_t* d = (uint16_t*)dst;
 	uint16_t* sEnd = s + (srcSize / 2);
@@ -179,6 +178,5 @@ uint32_t OBSld::compress(void* src, uint32_t srcSize, void* dst, uint32_t destSi
 	fprintf(OB_ERROR_OUTPUT, "* space saving:      %f\n", 1.0f-((float)resultSize)/((float)srcSize));
 	fprintf(OB_ERROR_OUTPUT, "-------------------------------------------\n");
 #endif
-	free(table);
 	return resultSize;
 }
