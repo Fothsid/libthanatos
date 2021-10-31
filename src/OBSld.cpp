@@ -76,107 +76,135 @@ uint32_t OBSld::decompress(void* src, uint32_t srcSize, void* dest, uint32_t des
 	return dPos * 2;
 }
 
-#define CMP_PUSH_REF_TOKEN(x, y) *d = ((x) & 0x7FF | (((y) & 0x1F) << 0xb)); d++;
-#define CMP_PUSH_VALUE(v) *d = (v); d++;
-#define CMP_TAG_AS_REFERENCE() *flag = (*flag) | (1 << (15 - tokenId));
-#define MAX(a, b) ((a) > (b) ? (a) : (b))
-#define MIN(a, b) ((a) < (b) ? (a) : (b))
+struct SearchInfo
+{
+	uint16_t* begin;
+	uint16_t* end;
+	uint32_t offset;
+	uint32_t length;
+};
+
+static int __OBSldSearch(SearchInfo* info, uint16_t* pos)
+{
+	info->length = 0;
+	uint16_t* src = info->begin;
+	if ((pos - src) > 0x7FF)
+		src = pos - 0x7FF;
+
+	uint16_t* nextSrc = src;
+	while (src < pos)
+	{
+		nextSrc += 1;
+		if (*src == *pos)
+		{
+			uint16_t* nextPos = pos + 1;
+			uint32_t length = 1;
+			int64_t dif = (int64_t) (nextSrc - nextPos);
+			while (length < 0xFFFF)
+			{
+				uint16_t val = *nextPos;
+				nextPos += 1;
+				if ((info->end <= nextPos) || *(nextPos + dif - 1) != val)
+					break;
+				length += 1;
+			}
+
+			if (length > info->length)
+			{
+				info->length = length;
+				info->offset = (int32_t) (pos - src);
+				if (length == 0xFFFF || 
+					length == (int32_t) (info->end - pos))
+					break;
+			}
+		}
+		src += 1;
+	}
+
+	if (info->length > 1)
+	{
+		return 1;
+	}
+	else
+		return 0;
+};
 
 uint32_t OBSld::compress(void* src, uint32_t srcSize, void* dst, uint32_t destSize)
 {
-	uint16_t* s = (uint16_t*)src;
-	uint16_t* d = (uint16_t*)dst;
-	uint16_t* sEnd = s + (srcSize / 2);
-	uint16_t* dEnd = d + (destSize / 2);
-	int dataSize = srcSize / 2;
+	if (!destSize)
+		return 0;
+	uint16_t* s = (uint16_t*) src;
+	uint16_t* sEnd = (uint16_t*) ((char*)src + srcSize);
+	uint16_t* d = (uint16_t*) dst;
+	uint16_t* dEnd = (uint16_t*) ((char*)dst + destSize);
 	
-	uint16_t* sc = s;
-	int tokenId = 0;
+	uint16_t* srcPos = s + 1;
+	uint16_t* dstPos = d + 2;
 	uint16_t* flag = d;
-	*flag = 0;
-	d += 1;
-	while (sc < sEnd && d < dEnd)
+	d[1] = *s;
+
+	uint16_t f = 0x4000;
+	uint32_t v = 0;
+
+	SearchInfo sInfo;
+	sInfo.begin = s;
+	sInfo.end = sEnd;
+
+	while (true)
 	{
-		int srcPos = sc - s;
-		int offset = 0, count = 0;
-		int lookStartPos = srcPos - 2047;
-		if (lookStartPos < 0)
-			lookStartPos = 0;
-
-		int lookPos = srcPos-1;
-		while (lookStartPos < lookPos)
+		if (f == 0)
 		{
-			int i = 0;
-			while ((i < 0xffff && 
-				   (srcPos + i <= dataSize)) && 
-				   (s[srcPos + i] == s[lookPos + i]))
-				i++;
-			if (count < i)
-			{
-				count = i;
-				offset = srcPos - lookPos;
-			}
-			if (i == 0xffff || (dataSize < srcPos + i))
-				break;
-			lookPos--;
+			*flag = v;
+			f = 0x8000;
+			v = 0;
+			flag = dstPos;
+			dstPos += 1;
 		}
-
-		if (count < 32)
+		if (__OBSldSearch(&sInfo, srcPos) != 0)
 		{
-			if (count > 1)
+			v |= f;
+			if (sInfo.length < 0x20)
 			{
-				CMP_PUSH_REF_TOKEN(offset, count);
-				CMP_TAG_AS_REFERENCE()
-				sc += count;
+				srcPos += sInfo.length;
+				*dstPos = (uint16_t) ((sInfo.length << 0xB) | (sInfo.offset & 0x7FF));
+				dstPos += 1;
 			}
 			else
 			{
-				CMP_PUSH_VALUE(*sc);
-				sc += 1;
+				if (sInfo.length > 0x7FF)
+					sInfo.length = 0x7FF;
+				srcPos += sInfo.length;
+				dstPos[0] = sInfo.offset & 0x7FF;
+				dstPos[1] = sInfo.length;
+				dstPos += 2;
 			}
-			tokenId++;
 		}
 		else
 		{
-			CMP_PUSH_REF_TOKEN(offset, 0);
-			CMP_PUSH_VALUE(count);
-			CMP_TAG_AS_REFERENCE()
-			sc += count;
-			tokenId++;
+			*dstPos = *srcPos;
+			dstPos += 1;
+			srcPos += 1;
 		}
-		
-		if (tokenId > 15)
-		{
-			tokenId = 0;
-			flag = d;
-			*flag = 0;
-			d += 1;
-		}
-	}
-	
-	if (tokenId == 0)
-	{
-		CMP_PUSH_VALUE(0x8000);
-		CMP_PUSH_VALUE(0);
-		CMP_PUSH_VALUE(0);
-		tokenId++;
-	}
-	else
-	{
-		CMP_PUSH_VALUE(0);
-		CMP_PUSH_VALUE(0);
-		*flag = (*flag) | (1 << (15 - tokenId));
-	}
 
-	uint32_t resultSize = (uint32_t)((d - ((uint16_t*)dst)) * 2);
-#ifdef OBSLD_COMP_REPORT
-	/* Report compression efficiency */
-	fprintf(OB_ERROR_OUTPUT, "---=== Compression efficiency report ===---\n");
-	fprintf(OB_ERROR_OUTPUT, "* source size:       %d\n", srcSize);
-	fprintf(OB_ERROR_OUTPUT, "* compressed size:   %d\n", resultSize);
-	fprintf(OB_ERROR_OUTPUT, "* compression ratio: %f\n", ((float)srcSize)/((float)resultSize));
-	fprintf(OB_ERROR_OUTPUT, "* space saving:      %f\n", 1.0f-((float)resultSize)/((float)srcSize));
-	fprintf(OB_ERROR_OUTPUT, "-------------------------------------------\n");
-#endif
-	return resultSize;
+		f >>= 1;
+		uint16_t pv = v;
+		if (sEnd <= srcPos)
+		{
+			if (f == 0)
+			{
+				*flag = pv;
+				pv = 0x8000;
+				flag = dstPos;
+				dstPos += 1;
+			}
+			else
+			{
+				pv = pv | f;
+			}
+			*dstPos = 0;
+			dstPos[1] = 0;
+			*flag = pv;
+			return (uint32_t) ((dstPos - d) + 1) * 2;
+		}
+	}
 }
