@@ -171,8 +171,8 @@ uint32_t OBSld::compress(void* src, uint32_t srcSize, void* dst, uint32_t destSi
 			}
 			else
 			{
-				if (sInfo.length > 0x7FF)
-					sInfo.length = 0x7FF;
+				if (sInfo.length > 0x80)
+					sInfo.length = 0x80;
 				srcPos += sInfo.length;
 				dstPos[0] = sInfo.offset & 0x7FF;
 				dstPos[1] = sInfo.length;
